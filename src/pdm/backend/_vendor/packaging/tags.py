@@ -11,12 +11,9 @@ import struct
 import subprocess
 import sys
 import sysconfig
+from collections.abc import Iterable, Iterator, Sequence
 from importlib.machinery import EXTENSION_SUFFIXES
 from typing import (
-    Iterable,
-    Iterator,
-    Sequence,
-    Tuple,
     cast,
 )
 
@@ -25,7 +22,7 @@ from . import _manylinux, _musllinux
 logger = logging.getLogger(__name__)
 
 PythonVersion = Sequence[int]
-MacVersion = Tuple[int, int]
+MacVersion = tuple[int, int]
 
 INTERPRETER_SHORT_NAMES: dict[str, str] = {
     "python": "py",  # Generic.
@@ -235,9 +232,7 @@ def cpython_tags(
     if use_abi3:
         for minor_version in range(python_version[1] - 1, 1, -1):
             for platform_ in platforms:
-                interpreter = "cp{version}".format(
-                    version=_version_nodot((python_version[0], minor_version))
-                )
+                interpreter = f"cp{_version_nodot((python_version[0], minor_version))}"
                 yield Tag(interpreter, "abi3", platform_)
 
 
@@ -439,9 +434,7 @@ def mac_platforms(
             compat_version = 10, minor_version
             binary_formats = _mac_binary_formats(compat_version, arch)
             for binary_format in binary_formats:
-                yield "macosx_{major}_{minor}_{binary_format}".format(
-                    major=10, minor=minor_version, binary_format=binary_format
-                )
+                yield f"macosx_{10}_{minor_version}_{binary_format}"
 
     if version >= (11, 0):
         # Starting with Mac OS 11, each yearly release bumps the major version
@@ -450,9 +443,7 @@ def mac_platforms(
             compat_version = major_version, 0
             binary_formats = _mac_binary_formats(compat_version, arch)
             for binary_format in binary_formats:
-                yield "macosx_{major}_{minor}_{binary_format}".format(
-                    major=major_version, minor=0, binary_format=binary_format
-                )
+                yield f"macosx_{major_version}_{0}_{binary_format}"
 
     if version >= (11, 0):
         # Mac OS 11 on x86_64 is compatible with binaries from previous releases.
@@ -467,20 +458,12 @@ def mac_platforms(
                 compat_version = 10, minor_version
                 binary_formats = _mac_binary_formats(compat_version, arch)
                 for binary_format in binary_formats:
-                    yield "macosx_{major}_{minor}_{binary_format}".format(
-                        major=compat_version[0],
-                        minor=compat_version[1],
-                        binary_format=binary_format,
-                    )
+                    yield f"macosx_{compat_version[0]}_{compat_version[1]}_{binary_format}"
         else:
             for minor_version in range(16, 3, -1):
                 compat_version = 10, minor_version
                 binary_format = "universal2"
-                yield "macosx_{major}_{minor}_{binary_format}".format(
-                    major=compat_version[0],
-                    minor=compat_version[1],
-                    binary_format=binary_format,
-                )
+                yield f"macosx_{compat_version[0]}_{compat_version[1]}_{binary_format}"
 
 
 def _linux_platforms(is_32bit: bool = _32_BIT_INTERPRETER) -> Iterator[str]:

@@ -1,15 +1,18 @@
+from __future__ import annotations
+
 import importlib.abc
 import importlib.machinery
 import importlib.util
 import sys
+from collections.abc import Sequence
 from types import ModuleType
-from typing import Dict, Optional, Sequence, Union
+from typing import Optional, Union
 
 ModulePath = Optional[Sequence[Union[bytes, str]]]
 
 
 class RedirectingFinder(importlib.abc.MetaPathFinder):
-    _redirections: Dict[str, str] = {}
+    _redirections: dict[str, str] = {}
 
     @classmethod
     def map_module(cls, name: str, path: str) -> None:
@@ -17,8 +20,8 @@ class RedirectingFinder(importlib.abc.MetaPathFinder):
 
     @classmethod
     def find_spec(
-        cls, fullname: str, path: ModulePath = None, target: Optional[ModuleType] = None
-    ) -> Optional[importlib.machinery.ModuleSpec]:
+        cls, fullname: str, path: ModulePath = None, target: ModuleType | None = None
+    ) -> importlib.machinery.ModuleSpec | None:
         if "." in fullname:
             return None
         if path is not None:

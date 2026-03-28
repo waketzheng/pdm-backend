@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import os
 import re
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Dict, Iterable, List, Tuple, Union
 
 __all__ = (
     "EditableProject",
@@ -33,20 +35,20 @@ class EditableException(Exception):
 
 
 class EditableProject:
-    def __init__(self, project_name: str, project_dir: Union[str, os.PathLike]) -> None:
+    def __init__(self, project_name: str, project_dir: str | os.PathLike) -> None:
         if not is_valid(project_name):
             raise ValueError(f"Project name {project_name} is not valid")
         self.project_name = normalize(project_name)
         self.bootstrap = f"_editable_impl_{self.project_name}"
         self.project_dir = Path(project_dir)
-        self.redirections: Dict[str, str] = {}
-        self.path_entries: List[Path] = []
-        self.subpackages: Dict[str, Path] = {}
+        self.redirections: dict[str, str] = {}
+        self.path_entries: list[Path] = []
+        self.subpackages: dict[str, Path] = {}
 
-    def make_absolute(self, path: Union[str, os.PathLike]) -> Path:
+    def make_absolute(self, path: str | os.PathLike) -> Path:
         return (self.project_dir / path).resolve()
 
-    def map(self, name: str, target: Union[str, os.PathLike]) -> None:
+    def map(self, name: str, target: str | os.PathLike) -> None:
         if "." in name:
             raise EditableException(
                 f"Cannot map {name} as it is not a top-level package"
@@ -59,13 +61,13 @@ class EditableProject:
         else:
             raise EditableException(f"{target} is not a valid Python package or module")
 
-    def add_to_path(self, dirname: Union[str, os.PathLike]) -> None:
+    def add_to_path(self, dirname: str | os.PathLike) -> None:
         self.path_entries.append(self.make_absolute(dirname))
 
-    def add_to_subpackage(self, package: str, dirname: Union[str, os.PathLike]) -> None:
+    def add_to_subpackage(self, package: str, dirname: str | os.PathLike) -> None:
         self.subpackages[package] = self.make_absolute(dirname)
 
-    def files(self) -> Iterable[Tuple[str, str]]:
+    def files(self) -> Iterable[tuple[str, str]]:
         yield f"{self.project_name}.pth", self.pth_file()
         if self.subpackages:
             for package, location in self.subpackages.items():
@@ -73,7 +75,7 @@ class EditableProject:
         if self.redirections:
             yield f"{self.bootstrap}.py", self.bootstrap_file()
 
-    def dependencies(self) -> List[str]:
+    def dependencies(self) -> list[str]:
         deps = []
         if self.redirections:
             deps.append("editables")
@@ -87,7 +89,7 @@ class EditableProject:
             lines.append(str(entry))
         return "\n".join(lines)
 
-    def package_redirection(self, package: str, location: Path) -> Tuple[str, str]:
+    def package_redirection(self, package: str, location: Path) -> tuple[str, str]:
         init_py = package.replace(".", "/") + "/__init__.py"
         content = f"__path__ = [{str(location)!r}]"
         return init_py, content

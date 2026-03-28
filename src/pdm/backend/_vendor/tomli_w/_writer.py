@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import string
 from collections.abc import Generator, Mapping
 from datetime import date, datetime, time
 from decimal import Decimal
-import string
 from types import MappingProxyType
 from typing import Any, BinaryIO, NamedTuple
 
@@ -17,11 +17,11 @@ MAX_LINE_LENGTH = 100
 COMPACT_ESCAPES = MappingProxyType(
     {
         "\u0008": "\\b",  # backspace
-        "\u000A": "\\n",  # linefeed
-        "\u000C": "\\f",  # form feed
-        "\u000D": "\\r",  # carriage return
+        "\u000a": "\\n",  # linefeed
+        "\u000c": "\\f",  # form feed
+        "\u000d": "\\r",  # carriage return
         "\u0022": '\\"',  # quote
-        "\u005C": "\\\\",  # backslash
+        "\u005c": "\\\\",  # backslash
     }
 )
 

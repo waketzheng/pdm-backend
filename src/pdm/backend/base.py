@@ -4,14 +4,13 @@ import glob
 import os
 import shutil
 import sys
+from collections.abc import Iterable, Mapping
 from fnmatch import fnmatch
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
-    Iterable,
     Literal,
-    Mapping,
     TypeVar,
     cast,
 )
